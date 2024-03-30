@@ -24,6 +24,22 @@ def cuedata(pth):
             metadata[ky].append(spi)
             break
  return metadata
+    
+def chaff(time):
+    min,sec=time.split(':')
+    min=int(min)
+    sec=int(sec)
+    if min>59:
+        hr=min//60
+        min%=60
+        if hr==0:
+            return "%02d:%02d" % (min, sec)
+        elif hr < 10:
+            return "0%0d:%02d:%02d" % (hr, min, sec)
+        else:
+            return "%d:%02d:%02d" % (hr, min, sec)
+    return time
+    
 def validtitle(name):
     for inva in ['/','\\','?','%','*',':', '|', '”', '<','>']:
         if inva in name:
@@ -100,6 +116,7 @@ def main(arg=sys.argv[1:]):
                  stime,etime=atime[0].decode('utf-8').strip(),atime[1].decode('utf-8').strip()
                  diff=str(timedif(stime,etime))
                 stime=stime.rsplit(":",1)[0]
+                stime=chaff(stime)
                 a+=1
                 b+=2
                 trno=f'track={a}'
