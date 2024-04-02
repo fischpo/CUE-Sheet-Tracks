@@ -20,4 +20,4 @@ When you run the script in command line, simply pass the image path in the follo
 `CUE.py "C:\Users\Desktop\cover.jpg"`
 
 ## Issues
-As far as I have tested there seems to be no problem. If perchance there is, please raise it [here](https://github.com/fischpo/CUE-Sheet-Tracks/issues).
+If there are any issues, please raise it [here](https://github.com/fischpo/CUE-Sheet-Tracks/issues).
