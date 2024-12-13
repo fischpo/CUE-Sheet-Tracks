@@ -1,6 +1,26 @@
 import os
 import sys
 import subprocess
+import argparse
+
+
+def validate_path(path):
+    if not os.path.exists(path):
+        raise argparse.ArgumentTypeError(f"{path} does not exist.")
+    return path
+
+
+def validate_album_art(image_path):
+    valid_extensions = ['.png','.jpg','.jpeg','.webp']
+    if not os.path.isfile(image_path):
+        raise argparse.ArgumentTypeError(f"Album art file {image_path} does not exist.")
+    
+    if not os.path.splitext(image_path)[1].lower() in valid_extensions:
+        raise argparse.ArgumentTypeError(f"Album art file {os.path.basename(image_path)} has an unsupported extension.")
+    
+    return image_path
+
+
 metadata={b"TITLE":[],b"PERFORMER":[],b"INDEX":[],b"REM COMPOSER":[]}
 def timedif(i1,i2):
     i1,i2=i1.split(":"),i2.split(":")
@@ -45,35 +65,16 @@ def validtitle(name):
         if inva in name:
             name=name.replace(inva,'')
     return name
-def main(arg=sys.argv[1:]):
-    if arg:
-        if os.path.isfile(arg[0]):
-            if os.path.splitext(arg[0])[1].lower() in ['.png','.jpg','.jpeg','.webp']:
-                asmodeus=arg[0]
-            else:
-                print(f"The extension of the file '{arg[0]}' is unrecognised.")
-                exit()
-        else:
-            print(f"The path '{arg[0]}' is not valid.")
-            exit()
-    while True:
-        repm=input("Location of CUE:")
-        if repm.lower()=="break":
-            exit()
-        if not os.path.exists(repm):
-            print('Location not valid.Try again or use "break" to exit')
-        else:
-            break
-    while True:
-        dspth=input("\nExtract Location:")
-        if dspth=="":
-            break
-        if dspth.lower()=="break":
-            exit()
-        if not os.path.exists(dspth):
-            print("Location not valid.Press Enter or enter a valid location")
-        else:
-            break
+
+def main(args):
+    repm = args.cue_location
+    dspth = args.extract_location
+    if args.album_art:
+        asmodeus = args.album_art
+    
+    print("Location of CUE:", repm)
+    print("Extract Location:", dspth)
+    
     reps=os.listdir(repm)
     treatgm=0
     for rep in reps:
@@ -90,7 +91,7 @@ def main(arg=sys.argv[1:]):
             datacu=cuedata(rep)
             mfile=loc
             ext=loc[loc.rindex('.'):]
-            if not arg:
+            if not args.album_art:
              cimg=["ffmpeg","-hide_banner","-y","-i",mfile,"-an","-vcodec","copy","cover.png"]
              aimg=subprocess.run(cimg,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
              asmodeus='cover.png'
@@ -135,11 +136,19 @@ def main(arg=sys.argv[1:]):
                 cimgad=['ffmpeg','-hide_banner','-y','-i',otfl,'-i',asmodeus,'-map','0:a','-map','1','-codec','copy','-metadata:s:v','title="Album cover"','-metadata:s:v','comment="Cover (front)"','-disposition:v','attached_pic',otfl_fn]
                 aimgad=subprocess.run(cimgad, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 os.remove(otfl)
-            if not arg:
+            if not args.album_art:
              os.remove(asmodeus)
         else:
             print("\nAudio file not found.")
     if not treatgm:
      print("\nNo CUE file found.")        
+
 if __name__=='__main__':
-  main()
+    parser = argparse.ArgumentParser(description="Extract tracks from a file with CUE sheet. Optionally adds custom album art to the tracks.")
+    parser.add_argument("cue_location", help="Path to the CUE file", type=validate_path)
+    parser.add_argument("extract_location", help="Path where to extract files", type=validate_path)
+    parser.add_argument("--album_art", help="Optional path to custom album art image for the tracks", type=validate_album_art, required=False)
+    
+    args = parser.parse_args()
+    
+    main(args)
