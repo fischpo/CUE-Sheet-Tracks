@@ -134,9 +134,14 @@ def main(arg=sys.argv[1:]):
                 aa=subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 cimgad=['ffmpeg','-hide_banner','-y','-i',otfl,'-i',asmodeus,'-map','0:a','-map','1','-codec','copy','-metadata:s:v','title="Album cover"','-metadata:s:v','comment="Cover (front)"','-disposition:v','attached_pic',otfl_fn]
                 aimgad=subprocess.run(cimgad, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                if b"No such file or directory" in aimgad.stdout:
+                    subprocess.run(['ffmpeg','-hide_banner','-y','-i',otfl,'-c:v','copy','-c:a','copy',otfl_fn],stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 os.remove(otfl)
             if not arg:
-             os.remove(asmodeus)
+              try:
+                os.remove(asmodeus)
+              except:
+                pass
         else:
             print("\nAudio file not found.")
     if not treatgm:
