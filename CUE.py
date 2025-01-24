@@ -155,7 +155,7 @@ def main(args):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description="Extract tracks from a file with CUE sheet.Also can add custom album art to the tracks.")
-    parser.add_argument("-i", help="Path to the CUE file", type=validate_path)
+    parser.add_argument("-i", help="Path to the CUE file", type=validate_path,required=True)
     parser.add_argument("-o", help="Path where to extract files", type=validate_path,required=False)
     parser.add_argument("-c", help="Optional path to custom album cover art image for the tracks", type=validate_album_art, required=False)
     
