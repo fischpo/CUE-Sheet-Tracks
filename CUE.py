@@ -85,7 +85,7 @@ def main(args):
      if rep.lower().endswith('.cue'):
         treatgm=1
         chk=0
-        rep=repm+"\\"+rep
+        rep=os.sep.join([repm,rep])
         for i in ['flac','m4a','mp3','aac','wav','ogg']:
             loc=rep[:-3]+i
             if os.path.exists(loc):
@@ -109,8 +109,8 @@ def main(args):
                 otfl=f'{ior+"_tmp"+ext}'
                 otfl_fn=f'{ior+ext}'
                 if dspth:
-                    otfl=dspth+"\\"+otfl
-                    otfl_fn=dspth+"\\"+otfl_fn
+                    otfl=os.sep.join([dspth,otfl])
+                    otfl_fn=os.sep.join([dspth,otfl_fn])
                 tit=f'title={i}'
                 artt='artist='+datacu[b'PERFORMER'][a].decode('utf-8')
                 atime=datacu[b'INDEX'][b:b+2]
