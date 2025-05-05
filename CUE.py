@@ -102,6 +102,15 @@ def main(args):
             a=0
             b=0
             wolfe=0
+            entrit=len(datacu[b'TITLE'])
+            entri=len(datacu[b'INDEX'])
+            if entrit==entri:
+                adde=1
+            elif entri==2*entrit:
+                adde=2
+            else:
+                print("\nCue has some missing timestamps.")
+                exit()
             print("\n","—"*55)
             for i in datacu[b'TITLE']:
                 i=i.decode('utf-8')
@@ -123,7 +132,7 @@ def main(args):
                 stime=stime.rsplit(":",1)[0]
                 stime=chaff(stime)
                 a+=1
-                b+=2
+                b+=adde
                 trno=f'track={a}'
                 print(f"TRACK {a}: {i}")
                 if wolfe:
