@@ -120,7 +120,10 @@ def main(args):
                     otfl=os.sep.join([dspth,otfl])
                     otfl_fn=os.sep.join([dspth,otfl_fn])
                 tit=f'title={i}'
-                artt='artist='+datacu[b'PERFORMER'][a].decode('utf-8')
+                try:
+                    artt='artist='+datacu[b'PERFORMER'][a].decode('utf-8')
+                except:
+                    artt='artist='
                 atime=datacu[b'INDEX'][b:b+2]
                 if len(atime)==1:
                     wolfe=1
