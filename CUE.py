@@ -21,7 +21,6 @@ def validate_album_art(image_path):
 
 
 metadata={b"TITLE":[],b"PERFORMER":[],b"INDEX":[],b"REM COMPOSER":[]}
-metadata2={"Spe":[0,0]}
 
 def timedif(i1,i2):
     i1,i2=i1.split(":"),i2.split(":")
@@ -34,18 +33,12 @@ def fixtimestamp(check):
     index3=[]
     a=0
     for i in check:
-        if len(check[i])!=2 and metadata[b"TITLE"][-1]==i:
-            index3+=[index2[a],index2[a]]
-            metadata2["Spe"][0]=1
-            metadata2["Spe"][1]=len(index3)
+        if len(check[i])==2:
+            index3+=[index2[a+1]]
         else:
-            index3+=[index2[a],index2[a+1]]
+            index3+=[index2[a]]
         a+=len(check[i])
-    if len(index3)==2*len(check):
-        metadata[b"INDEX"]=index3
-    else:
-        print("\nCue has some missing timestamps.")
-        exit()
+    metadata[b"INDEX"]=index3
 
 def cuedata(pth):
  with open(pth,"+r",encoding="utf-8") as ff:
@@ -74,14 +67,7 @@ def cuedata(pth):
             metadata[ky].append(spi)
             break
  ct=[]
- for title in check:
-    if len(ct)==1:
-        if ct[0]!=len(check[title]):
-            fixtimestamp(check)
-            break
-        ct=[]
-    ct.append(len(check[title]))
-     
+ fixtimestamp(check)    
 def chaff(time):
     min,sec=time.split(':')
     min=int(min)
@@ -176,7 +162,7 @@ def main(args):
                 b+=adde
                 trno=f'track={a}'
                 print(f"TRACK {a}: {i}")
-                if wolfe or (metadata2["Spe"][0] and metadata2["Spe"][1]==b):
+                if wolfe:
                     if ext!='.flac':
                      cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-avoid_negative_ts","make_zero","-c","copy","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
                     else:
