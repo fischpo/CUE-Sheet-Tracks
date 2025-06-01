@@ -181,11 +181,11 @@ def main(args):
                      cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-avoid_negative_ts","make_zero","-c","copy","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
                     else:
                      cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-avoid_negative_ts","make_zero","-map","0","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
-                
-                if ext!='.flac':
-                    cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-t",diff,"-avoid_negative_ts","make_zero","-c","copy","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
                 else:
-                    cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-t",diff,"-map","0","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
+                    if ext!='.flac':
+                        cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-t",diff,"-avoid_negative_ts","make_zero","-c","copy","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
+                    else:
+                        cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-t",diff,"-map","0","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
                 aa=subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 cimgad=['ffmpeg','-hide_banner','-y','-i',otfl,'-i',asmodeus,'-map','0:a','-map','1','-codec','copy','-metadata:s:v','title="Album cover"','-metadata:s:v','comment="Cover (front)"','-disposition:v','attached_pic',otfl_fn]
                 aimgad=subprocess.run(cimgad, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
