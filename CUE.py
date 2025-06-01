@@ -21,29 +21,67 @@ def validate_album_art(image_path):
 
 
 metadata={b"TITLE":[],b"PERFORMER":[],b"INDEX":[],b"REM COMPOSER":[]}
+metadata2={"Spe":[0,0]}
+
 def timedif(i1,i2):
     i1,i2=i1.split(":"),i2.split(":")
     a=(int(i1[0])*60)+int(i1[1])
     b=(int(i2[0])*60)+int(i2[1])
     return b-a
+
+def fixtimestamp(check):
+    index2=metadata[b"INDEX"]
+    index3=[]
+    a=0
+    for i in check:
+        if len(check[i])!=2 and metadata[b"TITLE"][-1]==i:
+            index3+=[index2[a],index2[a]]
+            metadata2["Spe"][0]=1
+            metadata2["Spe"][1]=len(index3)
+        else:
+            index3+=[index2[a],index2[a+1]]
+        a+=len(check[i])
+    if len(index3)==2*len(check):
+        metadata[b"INDEX"]=index3
+    else:
+        print("\nCue has some missing timestamps.")
+        exit()
+
 def cuedata(pth):
  with open(pth,"+r",encoding="utf-8") as ff:
   f=ff.read()
   k=f.encode('utf-8')
  ff=k.split(b"TRACK")
  ff.pop(0)
+ check={}
  for i in ff:
+  title=b""
   for spi in i.split(b"\n"):
     for ky in metadata:
         if ky in spi:
+            spii=spi.strip().split(b" ")
             if ky==b"INDEX":
+                spii2=spii[1].decode('utf-8')
+                spiii=check[title]
+                spiii+=[spii2]
+                check[title]=spiii
                 spi=spi.split(ky)[1].strip().split(b" ")[1]
             else:
                 spi=spi.split(ky)[1].strip().strip(b'""')
+            if ky==b"TITLE":
+                title=spi
+                check[title]=[]
             metadata[ky].append(spi)
             break
- return metadata
-    
+ ct=[]
+ for title in check:
+    if len(ct)==1:
+        if ct[0]!=len(check[title]):
+            fixtimestamp(check)
+            break
+        ct=[]
+    ct.append(len(check[title]))
+     
 def chaff(time):
     min,sec=time.split(':')
     min=int(min)
@@ -90,8 +128,9 @@ def main(args):
             if os.path.exists(loc):
                 chk=1
                 break
-        if chk:
-            datacu=cuedata(rep)
+        if chk:            
+            cuedata(rep)
+            datacu=metadata
             mfile=loc
             ext=loc[loc.rindex('.'):]
             if not args.c:
@@ -137,7 +176,7 @@ def main(args):
                 b+=adde
                 trno=f'track={a}'
                 print(f"TRACK {a}: {i}")
-                if wolfe:
+                if wolfe or (metadata2["Spe"][0] and metadata2["Spe"][1]==b):
                     if ext!='.flac':
                      cmd=["ffmpeg","-hide_banner","-ss",stime,"-y","-i",mfile,"-avoid_negative_ts","make_zero","-c","copy","-metadata",tit,"-metadata",artt,"-metadata",trno,otfl]
                     else:
